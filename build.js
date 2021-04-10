@@ -18,9 +18,7 @@ const inputOptions = {
         vue({
             preprocessStyles: true
         }),
-        postcss({
-            sourceMap: true
-        }),
+        postcss(),
         extractCssPlugin({
             async callback(result) {
                 await write(result, null, `style.css`, dist);
@@ -95,7 +93,11 @@ async function minify(code, map, filename) {
     };
 }
 
+// Works only in module project [!]
 function extractCssPlugin({callback}) {
+    const btoa = str => Buffer.from(str, "binary").toString("base64");
+ // const atob = b64 => Buffer.from(b64, "base64").toString("binary");
+
     const entries = [];
     return {
         name: "css-extract",
@@ -105,15 +107,21 @@ function extractCssPlugin({callback}) {
                 return "";
             }
         },
-        generateBundle(opts, bundle) {
+        async generateBundle(opts, bundle) {
             const results = [];
             for (const {code, id} of entries) {
                 // C:\Projects\formatted-number\components\Main.vue?vue&type=style&index=0&id=f889b9d8&scoped=true&lang.css
                 const filenameWithQueryParams = id.match(/[^\\\/]+$/)[0];    // Main.vue?vue&type=style&index=0&id=f889b9d8&scoped=true&lang.css
                 const filename = filenameWithQueryParams.match(/^[^?]+/)[0]; // Main.vue
 
-                const cssLine = code.match(/(?<=export var stylesheet=").+(?=";)/)[0];
-                const css = cssLine.replaceAll("\\n", "\n");
+                // import styleInject from 'C:/Projects...
+                // styleInject(css_248z);
+                const importIndex = code.indexOf("import styleInject");
+                const trimStart = importIndex === -1 ? code.length : importIndex;
+                const trimmedCode = code.substring(0, trimStart);
+
+                const base64Code = "data:text/javascript;base64," + btoa(trimmedCode);
+                const css = (await import(base64Code)).default;
 
                 const indexOfSourceMap = css.indexOf("/*# sourceMappingURL");
                 const to = indexOfSourceMap === -1 ? css.length : indexOfSourceMap;

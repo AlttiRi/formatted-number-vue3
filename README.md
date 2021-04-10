@@ -18,7 +18,7 @@ That's all.
 ---
 
 You can also load the developer version of Vue.js by specifying the search parameters of the URL.
-(It allows you to debug the site with [Vue.js devtools](https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd).)
+(It allows you to debug the site with [Vue.js devtools (beta)](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg).)
 
 Here is: [?dev=true](https://alttiri.github.io/formatted-number-vue3/?dev=true)
 

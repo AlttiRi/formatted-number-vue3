@@ -1,7 +1,7 @@
 import {rollup} from "rollup";
 import vue from "rollup-plugin-vue";
+import postcss from "rollup-plugin-postcss";
 import replace from "@rollup/plugin-replace";
-import css from "rollup-plugin-css-only";
 import resolve from "@rollup/plugin-node-resolve";
 import {minify as terser} from "terser";
 import MagicString from "magic-string";
@@ -15,12 +15,17 @@ const filename = "index";
 const inputOptions = {
     input: `${filename}.js`,
     plugins: [
-        css({
-            // output: `${dist}style.css` // It works with 2.1.0, but not with 3.1.0
-            output: writeVueStyles
-        }),
         vue({
-            css: false,
+            preprocessStyles: true
+        }),
+        postcss({
+            sourceMap: true
+        }),
+        extractCssPlugin({
+            async callback(result) {
+                await write(result, null, `style.css`, dist);
+                // console.log("extracted css was written");
+            }
         }),
         replace({
             preventAssignment: true,
@@ -37,7 +42,9 @@ const inputOptions = {
     ],
     // In order to use Vue.js from CDN. (So, it possible to use minified Vue.js with not minified main code)
     // V2: "vue.runtime.min.js"         / "vue.runtime.js"
+    // V3: "vue.runtime.global.prod.js" / "vue.runtime.global.js"
     external: ["vue"],
+    // BUG: I get `'withCtx' is imported from external module 'vue' but never used` warning with this option enabled.
 };
 
 /** @type {import("rollup").OutputOptions} */
@@ -88,24 +95,37 @@ async function minify(code, map, filename) {
     };
 }
 
-/**
- * Removes sourceMappingURL string and add component file name (as a comment) for a header purpose.
- * For  "vue": "^2.6.11"
- * with "rollup-plugin-css-only": "^2.1.0",
- */
-async function writeVueStyles(styles, styleNodes, meta) {
-    const styleBunch = Object.values(styleNodes)
-        .filter(text => text.trim())
-        .map(text => {
-            if (text.includes("sourceMappingURL")) {
-                const style = text.match(/[\s\S]+(?=\/\*# sourceMappingURL)/)[0];
-                const filename = text.match(/(?<=\/\*# sourceMappingURL=).+(?=\.map \*\/)/)[0];
-                return "/* " + filename + " */\n" + style;
+function extractCssPlugin({callback}) {
+    const entries = [];
+    return {
+        name: "css-extract",
+        transform(code, id) {
+            if (id.endsWith(".css")) {
+                entries.push({code, id});
+                return "";
             }
-            return text;
-        })
-        .reduce((pre, acc) => pre + acc, "");
-    await write(styleBunch, null, `style.css`, dist);
+        },
+        generateBundle(opts, bundle) {
+            const results = [];
+            for (const {code, id} of entries) {
+                // C:\Projects\formatted-number\components\Main.vue?vue&type=style&index=0&id=f889b9d8&scoped=true&lang.css
+                const filenameWithQueryParams = id.match(/[^\\\/]+$/)[0];    // Main.vue?vue&type=style&index=0&id=f889b9d8&scoped=true&lang.css
+                const filename = filenameWithQueryParams.match(/^[^?]+/)[0]; // Main.vue
+
+                const cssLine = code.match(/(?<=export var stylesheet=").+(?=";)/)[0];
+                const css = cssLine.replaceAll("\\n", "\n");
+
+                const indexOfSourceMap = css.indexOf("/*# sourceMappingURL");
+                const to = indexOfSourceMap === -1 ? css.length : indexOfSourceMap;
+                const from = css.charAt(0) === "\n" ? 1 : 0;
+                const result = "/* " + filename + " */\n" + css.substring(from, to);
+
+                results.push(result);
+            }
+            const bunch = results.join("\n");
+            callback(bunch);
+        }
+    }
 }
 
 const pathsMapping = [

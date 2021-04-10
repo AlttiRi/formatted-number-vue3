@@ -25,7 +25,7 @@
 <div id="app"></div>
 
 <script type="module">
-    // Add search param `dev=true` for developer Vue version.
+    // Add search param `dev=true` for developer Vue version. (You can use the Vue.js extension)
     // Add search param `min=true` for minified version of the app script.
     // For example, `dev=true&min=true`
 
@@ -39,7 +39,8 @@
 
     Promise.resolve()
         // To debug Vue.js set `process.env.NODE_ENV` to `dev` (in build.js) if you does not load it from CDN.
-        .then(_ => appendScript(`https://cdn.jsdelivr.net/npm/vue/dist/vue.runtime${_dev ? "" : ".min"}.js`))
+     // .then(_ => appendScript(`https://cdn.jsdelivr.net/npm/vue/dist/vue.runtime${_dev ? "" : ".min"}.js`))              // Vue 2
+        .then(_ => appendScript(`https://cdn.jsdelivr.net/npm/vue@next/dist/vue.runtime.global${_dev ? "" : ".prod"}.js`)) // Vue 3
         .then(_ => appendScript(`./dist/index${_min ? ".min" : ""}.js`));
 
     function appendScript(src) {

@@ -46,7 +46,7 @@ function randomHexColor() {
   align-items: center
   height: 100%
 
-.main::v-deep
+.main:deep()
   .formatted-number
     font-size: 8vw
     color: cornflowerblue
@@ -56,7 +56,7 @@ function randomHexColor() {
         letter-spacing: 1.6vw
 
 @media all and (min-width: 1500px)
-  .main::v-deep
+  .main:deep()
     .formatted-number
       font-size: 120px
       text-shadow: 0 0 30px #08080840

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-repo_name="formatted-number";
+repo_name="formatted-number-vue3";
 owner_name="AlttiRi";
 
 # Config ("true" to enable)

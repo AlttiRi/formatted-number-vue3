@@ -1,16 +1,5 @@
-(function (Vue) {
+(function (vue) {
   'use strict';
-
-  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-  var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
-
-  //
-  //
-  //
-  //
-  //
-  //
 
   var script$3 = {
     name: "NumberTrio",
@@ -61,133 +50,26 @@
     }
   };
 
-  function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier /* server only */, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
-      if (typeof shadowMode !== 'boolean') {
-          createInjectorSSR = createInjector;
-          createInjector = shadowMode;
-          shadowMode = false;
-      }
-      // Vue.extend constructor export interop.
-      const options = typeof script === 'function' ? script.options : script;
-      // render functions
-      if (template && template.render) {
-          options.render = template.render;
-          options.staticRenderFns = template.staticRenderFns;
-          options._compiled = true;
-          // functional template
-          if (isFunctionalTemplate) {
-              options.functional = true;
-          }
-      }
-      // scopedId
-      if (scopeId) {
-          options._scopeId = scopeId;
-      }
-      let hook;
-      if (moduleIdentifier) {
-          // server build
-          hook = function (context) {
-              // 2.3 injection
-              context =
-                  context || // cached call
-                      (this.$vnode && this.$vnode.ssrContext) || // stateful
-                      (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext); // functional
-              // 2.2 with runInNewContext: true
-              if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-                  context = __VUE_SSR_CONTEXT__;
-              }
-              // inject component styles
-              if (style) {
-                  style.call(this, createInjectorSSR(context));
-              }
-              // register component module identifier for async chunk inference
-              if (context && context._registeredComponents) {
-                  context._registeredComponents.add(moduleIdentifier);
-              }
-          };
-          // used by ssr in case component is cached and beforeCreate
-          // never gets called
-          options._ssrRegister = hook;
-      }
-      else if (style) {
-          hook = shadowMode
-              ? function (context) {
-                  style.call(this, createInjectorShadow(context, this.$root.$options.shadowRoot));
-              }
-              : function (context) {
-                  style.call(this, createInjector(context));
-              };
-      }
-      if (hook) {
-          if (options.functional) {
-              // register for functional component in vue file
-              const originalRender = options.render;
-              options.render = function renderWithStyleInjection(h, context) {
-                  hook.call(context);
-                  return originalRender(h, context);
-              };
-          }
-          else {
-              // inject component registration as beforeCreate hook
-              const existing = options.beforeCreate;
-              options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
-          }
-      }
-      return script;
+  const _hoisted_1$2 = { class: "trio" };
+  const _hoisted_2$1 = { key: 0 };
+
+  function render$3(_ctx, _cache, $props, $setup, $data, $options) {
+    return (vue.openBlock(), vue.createBlock("span", _hoisted_1$2, [
+      ($options.part1)
+        ? (vue.openBlock(), vue.createBlock("span", _hoisted_2$1, vue.toDisplayString($options.part1), 1 /* TEXT */))
+        : vue.createCommentVNode("v-if", true),
+      ($options.part2)
+        ? (vue.openBlock(), vue.createBlock("span", {
+            key: 1,
+            class: "padded",
+            style: {letterSpacing: $props.padding}
+          }, vue.toDisplayString($options.part2), 5 /* TEXT, STYLE */))
+        : vue.createCommentVNode("v-if", true)
+    ]))
   }
 
-  /* script */
-  const __vue_script__$3 = script$3;
-
-  /* template */
-  var __vue_render__$3 = function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c("span", { staticClass: "trio" }, [
-      _vm.part1 ? _c("span", [_vm._v(_vm._s(_vm.part1))]) : _vm._e(),
-      _vm.part2
-        ? _c(
-            "span",
-            { staticClass: "padded", style: { letterSpacing: _vm.padding } },
-            [_vm._v(_vm._s(_vm.part2))]
-          )
-        : _vm._e()
-    ])
-  };
-  var __vue_staticRenderFns__$3 = [];
-  __vue_render__$3._withStripped = true;
-
-    /* style */
-    const __vue_inject_styles__$3 = undefined;
-    /* scoped */
-    const __vue_scope_id__$3 = undefined;
-    /* module identifier */
-    const __vue_module_identifier__$3 = undefined;
-    /* functional template */
-    const __vue_is_functional_template__$3 = false;
-    /* style inject */
-    
-    /* style inject SSR */
-    
-    /* style inject shadow dom */
-    
-
-    
-    const __vue_component__$3 = /*#__PURE__*/normalizeComponent(
-      { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
-      __vue_inject_styles__$3,
-      __vue_script__$3,
-      __vue_scope_id__$3,
-      __vue_is_functional_template__$3,
-      __vue_module_identifier__$3,
-      false,
-      undefined,
-      undefined,
-      undefined
-    );
-
-  //
+  script$3.render = render$3;
+  script$3.__file = "components/NumberTrio.vue";
 
   var script$2 = {
     name: "FormattedNumber",
@@ -253,84 +135,53 @@
         return trios;
       }
     },
-    components: {NumberTrio: __vue_component__$3}
+    components: {NumberTrio: script$3}
   };
 
-  /* script */
-  const __vue_script__$2 = script$2;
+  const _hoisted_1$1 = { class: "formatted-number" };
+  const _hoisted_2 = {
+    key: 0,
+    class: "minus"
+  };
+  const _hoisted_3 = { class: "integer" };
+  const _hoisted_4 = {
+    key: 1,
+    class: "point"
+  };
+  const _hoisted_5 = {
+    key: 2,
+    class: "decimal"
+  };
 
-  /* template */
-  var __vue_render__$2 = function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c("span", { staticClass: "formatted-number" }, [
-      _vm.isNegative
-        ? _c("span", { staticClass: "minus" }, [_vm._v("-")])
-        : _vm._e(),
-      _c(
-        "span",
-        { staticClass: "integer" },
-        _vm._l(_vm.integerTrios, function(integerTrio, index) {
-          return _c("NumberTrio", {
+  function render$2(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_NumberTrio = vue.resolveComponent("NumberTrio");
+
+    return (vue.openBlock(), vue.createBlock("span", _hoisted_1$1, [
+      ($options.isNegative)
+        ? (vue.openBlock(), vue.createBlock("span", _hoisted_2, "-"))
+        : vue.createCommentVNode("v-if", true),
+      vue.createVNode("span", _hoisted_3, [
+        (vue.openBlock(true), vue.createBlock(vue.Fragment, null, vue.renderList($options.integerTrios, (integerTrio, index) => {
+          return (vue.openBlock(), vue.createBlock(_component_NumberTrio, {
+            value: integerTrio,
+            position: index,
+            count: $options.integerTrios.length,
             key: index,
-            attrs: {
-              value: integerTrio,
-              position: index,
-              count: _vm.integerTrios.length,
-              padding: _vm.padding
-            }
-          })
-        }),
-        1
-      ),
-      _vm.decimalTrimmed
-        ? _c("span", { staticClass: "point" }, [_vm._v(".")])
-        : _vm._e(),
-      _vm.decimalTrimmed
-        ? _c("span", { staticClass: "decimal" }, [
-            _vm._v(_vm._s(_vm.decimalTrimmed))
-          ])
-        : _vm._e()
-    ])
-  };
-  var __vue_staticRenderFns__$2 = [];
-  __vue_render__$2._withStripped = true;
+            padding: $props.padding
+          }, null, 8 /* PROPS */, ["value", "position", "count", "padding"]))
+        }), 128 /* KEYED_FRAGMENT */))
+      ]),
+      ($options.decimalTrimmed)
+        ? (vue.openBlock(), vue.createBlock("span", _hoisted_4, "."))
+        : vue.createCommentVNode("v-if", true),
+      ($options.decimalTrimmed)
+        ? (vue.openBlock(), vue.createBlock("span", _hoisted_5, vue.toDisplayString($options.decimalTrimmed), 1 /* TEXT */))
+        : vue.createCommentVNode("v-if", true)
+    ]))
+  }
 
-    /* style */
-    const __vue_inject_styles__$2 = undefined;
-    /* scoped */
-    const __vue_scope_id__$2 = undefined;
-    /* module identifier */
-    const __vue_module_identifier__$2 = undefined;
-    /* functional template */
-    const __vue_is_functional_template__$2 = false;
-    /* style inject */
-    
-    /* style inject SSR */
-    
-    /* style inject shadow dom */
-    
-
-    
-    const __vue_component__$2 = /*#__PURE__*/normalizeComponent(
-      { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
-      __vue_inject_styles__$2,
-      __vue_script__$2,
-      __vue_scope_id__$2,
-      __vue_is_functional_template__$2,
-      __vue_module_identifier__$2,
-      false,
-      undefined,
-      undefined,
-      undefined
-    );
-
-  //
-  //
-  //
-  //
-  //
+  script$2.render = render$2;
+  script$2.__file = "components/FormattedNumber.vue";
 
   var script$1 = {
     name: "NoDoubleClickSelectable",
@@ -352,57 +203,17 @@
     }
   };
 
-  /* script */
-  const __vue_script__$1 = script$1;
+  function render$1(_ctx, _cache, $props, $setup, $data, $options) {
+    return (vue.openBlock(), vue.createBlock("span", {
+      class: "no-double-click-selectable",
+      onClick: _cache[1] || (_cache[1] = (...args) => ($options.preventUnnecessarySelecting && $options.preventUnnecessarySelecting(...args)))
+    }, [
+      vue.renderSlot(_ctx.$slots, "default")
+    ]))
+  }
 
-  /* template */
-  var __vue_render__$1 = function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c(
-      "span",
-      {
-        staticClass: "no-double-click-selectable",
-        on: { click: _vm.preventUnnecessarySelecting }
-      },
-      [_vm._t("default")],
-      2
-    )
-  };
-  var __vue_staticRenderFns__$1 = [];
-  __vue_render__$1._withStripped = true;
-
-    /* style */
-    const __vue_inject_styles__$1 = undefined;
-    /* scoped */
-    const __vue_scope_id__$1 = undefined;
-    /* module identifier */
-    const __vue_module_identifier__$1 = undefined;
-    /* functional template */
-    const __vue_is_functional_template__$1 = false;
-    /* style inject */
-    
-    /* style inject SSR */
-    
-    /* style inject shadow dom */
-    
-
-    
-    const __vue_component__$1 = /*#__PURE__*/normalizeComponent(
-      { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
-      __vue_inject_styles__$1,
-      __vue_script__$1,
-      __vue_scope_id__$1,
-      __vue_is_functional_template__$1,
-      __vue_module_identifier__$1,
-      false,
-      undefined,
-      undefined,
-      undefined
-    );
-
-  //
+  script$1.render = render$1;
+  script$1.__file = "components/NoDoubleClickSelectable.vue";
 
   var script = {
     name: "Main",
@@ -418,8 +229,8 @@
       }
     },
     components: {
-      FormattedNumber: __vue_component__$2,
-      NoDoubleClickSelectable: __vue_component__$1
+      FormattedNumber: script$2,
+      NoDoubleClickSelectable: script$1
     }
   };
 
@@ -432,68 +243,39 @@
     return `rgb(${numbers.join()})`;
   }
 
-  /* script */
-  const __vue_script__ = script;
-  /* template */
-  var __vue_render__ = function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c("div", { staticClass: "main" }, [
-      _c(
-        "span",
-        { staticClass: "number", on: { click: _vm.onClick } },
-        [
-          _c(
-            "NoDoubleClickSelectable",
-            [
-              _c("FormattedNumber", {
-                style: { color: _vm.color },
-                attrs: { number: _vm.value }
-              })
-            ],
-            1
-          )
-        ],
-        1
-      )
-    ])
-  };
-  var __vue_staticRenderFns__ = [];
-  __vue_render__._withStripped = true;
+  const _withId = /*#__PURE__*/vue.withScopeId("data-v-f889b9d8");
 
-    /* style */
-    const __vue_inject_styles__ = undefined;
-    /* scoped */
-    const __vue_scope_id__ = "data-v-5cad3ff0";
-    /* module identifier */
-    const __vue_module_identifier__ = undefined;
-    /* functional template */
-    const __vue_is_functional_template__ = false;
-    /* style inject */
-    
-    /* style inject SSR */
-    
-    /* style inject shadow dom */
-    
+  vue.pushScopeId("data-v-f889b9d8");
+  const _hoisted_1 = { class: "main" };
+  vue.popScopeId();
 
-    
-    const __vue_component__ = /*#__PURE__*/normalizeComponent(
-      { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
-      __vue_inject_styles__,
-      __vue_script__,
-      __vue_scope_id__,
-      __vue_is_functional_template__,
-      __vue_module_identifier__,
-      false,
-      undefined,
-      undefined,
-      undefined
-    );
+  const render = /*#__PURE__*/_withId((_ctx, _cache, $props, $setup, $data, $options) => {
+    const _component_FormattedNumber = vue.resolveComponent("FormattedNumber");
+    const _component_NoDoubleClickSelectable = vue.resolveComponent("NoDoubleClickSelectable");
 
-  new Vue__default['default']({
-      render: createElement => createElement(__vue_component__),
-  }).$mount("#app");
+    return (vue.openBlock(), vue.createBlock("div", _hoisted_1, [
+      vue.createVNode("span", {
+        class: "number",
+        onClick: _cache[1] || (_cache[1] = (...args) => ($options.onClick && $options.onClick(...args)))
+      }, [
+        vue.createVNode(_component_NoDoubleClickSelectable, null, {
+          default: _withId(() => [
+            vue.createVNode(_component_FormattedNumber, {
+              style: {color: $data.color},
+              number: $data.value
+            }, null, 8 /* PROPS */, ["style", "number"])
+          ]),
+          _: 1 /* STABLE */
+        })
+      ])
+    ]))
+  });
+
+  script.render = render;
+  script.__scopeId = "data-v-f889b9d8";
+  script.__file = "components/Main.vue";
+
+  vue.createApp(script).mount("#app");
 
 }(Vue));
 //# sourceMappingURL=index.js.map

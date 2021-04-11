@@ -19,6 +19,7 @@ const inputOptions = {
             preprocessStyles: true
         }),
         postcss(),
+        sourceMapsPathChangerPlugin(),
         extractCssPlugin({
             async callback(result) {
                 await write(result, null, `style.css`, dist);
@@ -93,6 +94,21 @@ async function minify(code, map, filename) {
     };
 }
 
+function sourceMapsPathChangerPlugin() {
+    return {
+        name: "source-maps-plugin",
+        async generateBundle(options, bundle, isWrite) {
+            Object.keys(bundle).forEach(key => {
+                const map = bundle[key]?.map;
+                if (map) {
+                    bundle[key].map = changeSourceMapPaths(map);
+                }
+            });
+        }
+    }
+}
+
+
 // Works only in module project [!]
 function extractCssPlugin({callback}) {
     const btoa = str => Buffer.from(str, "binary").toString("base64");
@@ -107,7 +123,7 @@ function extractCssPlugin({callback}) {
                 return "";
             }
         },
-        async generateBundle(opts, bundle) {
+        async generateBundle(options, bundle, isWrite) {
             const results = [];
             for (const {code, id} of entries) {
                 // C:\Projects\formatted-number\components\Main.vue?vue&type=style&index=0&id=f889b9d8&scoped=true&lang.css
@@ -145,8 +161,10 @@ async function write(code, map, name, dist) {
     await fs.mkdir(dist, {recursive: true});
     await fs.writeFile(`${dist}${name}`, code);
     if (map) {
-        let _map = changeSourceMapPaths(map);
-        _map = JSON.stringify(_map);
+        // now I use plugin
+        // let _map = changeSourceMapPaths(map);
+        // _map = JSON.stringify(_map);
+        let _map = JSON.stringify(map);
         await fs.writeFile(`${dist}${name}.map`, _map);
     }
 }

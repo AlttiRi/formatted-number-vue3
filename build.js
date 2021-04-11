@@ -19,7 +19,10 @@ const inputOptions = {
             preprocessStyles: true
         }),
         postcss(),
-        sourceMapsPathChangerPlugin(),
+        sourceMapsPathChangerPlugin([
+            ["../node_modules/", "node-modules:///"],
+            ["../", "source-maps:///"],
+        ]),
         extractCssPlugin({
             async callback(result) {
                 await write(result, null, `style.css`, dist);
@@ -94,7 +97,18 @@ async function minify(code, map, filename) {
     };
 }
 
-function sourceMapsPathChangerPlugin() {
+function sourceMapsPathChangerPlugin(pathsMapping) {
+    function changeSourceMapPaths(map) {
+        function _beautify(str) {
+            return pathsMapping.reduce((pre, [value, replacer]) => {
+                return pre.replace(value, replacer)
+            }, str);
+        }
+        for (let i = 0; i < map.sources.length; i++) {
+            map.sources[i] = _beautify(map.sources[i]);
+        }
+        return map;
+    }
     return {
         name: "source-maps-plugin",
         async generateBundle(options, bundle, isWrite) {
@@ -107,7 +121,6 @@ function sourceMapsPathChangerPlugin() {
         }
     }
 }
-
 
 // Works only in module project [!]
 function extractCssPlugin({callback}) {
@@ -152,35 +165,15 @@ function extractCssPlugin({callback}) {
     }
 }
 
-const pathsMapping = [
-    ["../node_modules/", "node-modules:///"],
-    ["../", "source-maps:///"],
-];
 
 async function write(code, map, name, dist) {
     await fs.mkdir(dist, {recursive: true});
     await fs.writeFile(`${dist}${name}`, code);
     if (map) {
-        // now I use plugin
-        // let _map = changeSourceMapPaths(map);
-        // _map = JSON.stringify(_map);
-        let _map = JSON.stringify(map);
+        const _map = JSON.stringify(map);
         await fs.writeFile(`${dist}${name}.map`, _map);
     }
 }
-
-function changeSourceMapPaths(map) {
-    function _beautify(str) {
-        return pathsMapping.reduce((pre, [value, replacer]) => {
-            return pre.replace(value, replacer)
-        }, str);
-    }
-    for (let i = 0; i < map.sources.length; i++) {
-        map.sources[i] = _beautify(map.sources[i]);
-    }
-    return map;
-}
-
 
 // It's used to append `//# sourceMappingURL=name.js.map`
 function appendFinally(text) {

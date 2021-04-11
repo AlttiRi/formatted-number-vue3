@@ -97,7 +97,7 @@ async function minify(code, map, filename) {
     };
 }
 
-function sourceMapsPathChangerPlugin(pathsMapping) {
+function sourceMapsPathChangerPlugin(pathsMapping = []) {
     function changeSourceMapPaths(map) {
         function _beautify(str) {
             return pathsMapping.reduce((pre, [value, replacer]) => {
@@ -122,45 +122,60 @@ function sourceMapsPathChangerPlugin(pathsMapping) {
     }
 }
 
-// Works only in module project [!]
-function extractCssPlugin({callback}) {
+/**
+ * NOTE: Works only in module project [!] Since it uses `import()`
+ * @param options
+ * @param options.callback - function to handle the result CSS bundle
+ * @param options.overwriteBundle - the name of CSS bundle that Rollup.js (Vite.js) writes to disk,
+ * for example: "index.css" even if the real file name will be: "assets/index.e2206225.css"
+ */
+function extractCssPlugin({callback, overwriteBundle}) {
     const btoa = str => Buffer.from(str, "binary").toString("base64");
  // const atob = b64 => Buffer.from(b64, "base64").toString("binary");
 
     const entries = [];
+    async function resultCssBundle() {
+        const results = [];
+        for (const {code, id} of entries) {
+            // C:\Projects\formatted-number\components\Main.vue?vue&type=style&index=0&id=f889b9d8&scoped=true&lang.css
+            const filenameWithQueryParams = id.match(/[^\\\/]+$/)[0];    // Main.vue?vue&type=style&index=0&id=f889b9d8&scoped=true&lang.css
+            const filename = filenameWithQueryParams.match(/^[^?]+/)[0]; // Main.vue
+
+            // import styleInject from 'C:/Projects...
+            // styleInject(css_248z);
+            const importIndex = code.indexOf("import styleInject");
+            const trimStart = importIndex === -1 ? code.length : importIndex;
+            const trimmedCode = code.substring(0, trimStart);
+
+            const base64Code = "data:text/javascript;base64," + btoa(trimmedCode);
+            const css = (await import(base64Code)).default;
+
+            const indexOfSourceMap = css.indexOf("/*# sourceMappingURL");
+            const to = indexOfSourceMap === -1 ? css.length : indexOfSourceMap;
+            const from = css.charAt(0) === "\n" ? 1 : 0;
+            const result = "/* " + filename + " */\n" + css.substring(from, to);
+
+            results.push(result);
+        }
+        return results.join("\n");
+    }
+
     return {
         name: "css-extract",
         transform(code, id) {
-            if (id.endsWith(".css")) {
+            const isCss = [".css", ".sass", ".scss", ".less", ".stylus"].some(ext => id.endsWith(ext));
+            if (isCss) {
                 entries.push({code, id});
                 return "";
             }
         },
-        async generateBundle(options, bundle, isWrite) {
-            const results = [];
-            for (const {code, id} of entries) {
-                // C:\Projects\formatted-number\components\Main.vue?vue&type=style&index=0&id=f889b9d8&scoped=true&lang.css
-                const filenameWithQueryParams = id.match(/[^\\\/]+$/)[0];    // Main.vue?vue&type=style&index=0&id=f889b9d8&scoped=true&lang.css
-                const filename = filenameWithQueryParams.match(/^[^?]+/)[0]; // Main.vue
-
-                // import styleInject from 'C:/Projects...
-                // styleInject(css_248z);
-                const importIndex = code.indexOf("import styleInject");
-                const trimStart = importIndex === -1 ? code.length : importIndex;
-                const trimmedCode = code.substring(0, trimStart);
-
-                const base64Code = "data:text/javascript;base64," + btoa(trimmedCode);
-                const css = (await import(base64Code)).default;
-
-                const indexOfSourceMap = css.indexOf("/*# sourceMappingURL");
-                const to = indexOfSourceMap === -1 ? css.length : indexOfSourceMap;
-                const from = css.charAt(0) === "\n" ? 1 : 0;
-                const result = "/* " + filename + " */\n" + css.substring(from, to);
-
-                results.push(result);
+        async generateBundle(opts, bundles, isWrite) {
+            const bunchCss = await resultCssBundle();
+            if (isWrite && overwriteBundle) {
+                const bundle = Object.values(bundles).find(bundle => bundle.name === overwriteBundle);
+                bundle.source = bunchCss;
             }
-            const bunch = results.join("\n");
-            callback(bunch);
+            callback(bunchCss);
         }
     }
 }

@@ -40,7 +40,7 @@ const inputOptions = {
         resolve({
             browser: true
         }),
-        appendFinally(sourceMappingURL(filename)) // I use it since I write maps manually
+        appendFinallyPlugin(sourceMappingURL(filename)) // I use it since I write maps manually
     ],
     // In order to use Vue.js from CDN. (So, it possible to use minified Vue.js with not minified main code)
     // V2: "vue.runtime.min.js"         / "vue.runtime.js"
@@ -191,7 +191,7 @@ async function write(code, map, name, dist) {
 }
 
 // It's used to append `//# sourceMappingURL=name.js.map`
-function appendFinally(text) {
+function appendFinallyPlugin(text) {
     return {
         name: "append-text-before-end",
         renderChunk(code, chunkInfo, outputOptions) {

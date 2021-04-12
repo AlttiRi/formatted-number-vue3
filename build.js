@@ -173,7 +173,9 @@ function extractCssPlugin({callback, overwriteBundle}) {
             const bunchCss = await resultCssBundle();
             if (isWrite && overwriteBundle) {
                 const bundle = Object.values(bundles).find(bundle => bundle.name === overwriteBundle);
-                bundle.source = bunchCss;
+                if (bundle) {
+                    bundle.source = bunchCss;
+                }
             }
             callback(bunchCss);
         }

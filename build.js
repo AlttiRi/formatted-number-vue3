@@ -150,6 +150,10 @@ function extractCssPlugin({callback, overwriteBundle}) {
             const base64Code = "data:text/javascript;base64," + btoa(trimmedCode);
             const css = (await import(base64Code)).default;
 
+            if (!css) {
+                return ""; // Empty CSS file
+            }
+
             const indexOfSourceMap = css.indexOf("/*# sourceMappingURL");
             const to = indexOfSourceMap === -1 ? css.length : indexOfSourceMap;
             const from = css.charAt(0) === "\n" ? 1 : 0;

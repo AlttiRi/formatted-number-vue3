@@ -177,7 +177,9 @@ function extractCssPlugin({callback, overwriteBundle}) {
                     bundle.source = bunchCss;
                 }
             }
-            callback(bunchCss);
+            if (typeof callback === "function") {
+                callback(bunchCss);
+            }
         }
     }
 }

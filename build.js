@@ -23,11 +23,12 @@ const inputOptions = {
             ["../node_modules/", "node-modules:///"],
             ["../", "source-maps:///"],
         ]),
-        extractCssPlugin({
+        cssBundlePlugin({
             async callback(result) {
                 await write(result, null, `style.css`, dist);
                 // console.log("extracted css was written");
-            }
+            },
+            importFromModule: true
         }),
         replace({
             preventAssignment: true,
@@ -110,7 +111,7 @@ function sourceMapsPathChangerPlugin(pathsMapping = []) {
         return map;
     }
     return {
-        name: "source-maps-plugin",
+        name: "source-maps-path-changer-plugin",
         async generateBundle(options, bundle, isWrite) {
             Object.keys(bundle).forEach(key => {
                 const map = bundle[key]?.map;
@@ -124,14 +125,21 @@ function sourceMapsPathChangerPlugin(pathsMapping = []) {
 
 /**
  * NOTE: Works only in module project [!] Since it uses `import()`
+ *
+ * NOTES FOR VITE.JS:
+ * - `removeCode` works only if it used as Vite plugin;
+ * - `overwriteBundle` works only if it used as Rollup plugin (and did not use `removeCode`);
+ *
  * @param options
- * @param options.callback - function to handle the result CSS bundle
+ * @param options.callback - function to handle the result CSS bundle. Use to write CSS to disk, ot just for debug.
  * @param options.overwriteBundle - the name of CSS bundle that Rollup.js (Vite.js) writes to disk,
- * for example: "index.css" even if the real file name will be: "assets/index.e2206225.css"
+ * for example: "index.css" even if the real file name will be: "assets/index.e2206225.css".
+ * @param options.importFromModule - set to `true` to get CSS from module that exports it, or `false` if it is a pure CSS code.
+ * @param options.removeCode - remove code after `transform` hook. Use it if you do not use `overwriteBundle` option.
  */
-function extractCssPlugin({callback, overwriteBundle}) {
+function cssBundlePlugin({callback, overwriteBundle, importFromModule, removeCode} = {}) {
     const btoa = str => Buffer.from(str, "binary").toString("base64");
- // const atob = b64 => Buffer.from(b64, "base64").toString("binary");
+//const atob = b64 => Buffer.from(b64, "base64").toString("binary");
 
     const entries = [];
     async function resultCssBundle() {
@@ -141,17 +149,23 @@ function extractCssPlugin({callback, overwriteBundle}) {
             const filenameWithQueryParams = id.match(/[^\\\/]+$/)[0];    // Main.vue?vue&type=style&index=0&id=f889b9d8&scoped=true&lang.css
             const filename = filenameWithQueryParams.match(/^[^?]+/)[0]; // Main.vue
 
-            // import styleInject from 'C:/Projects...
-            // styleInject(css_248z);
-            const importIndex = code.indexOf("import styleInject");
-            const trimStart = importIndex === -1 ? code.length : importIndex;
-            const trimmedCode = code.substring(0, trimStart);
+            let css;
+            if (importFromModule) {
+                try {
+                    // import styleInject from 'C:/Projects...
+                    // styleInject(css_248z);
+                    const importIndex = code.indexOf("import styleInject");
+                    const trimStart = importIndex === -1 ? code.length : importIndex;
+                    const trimmedCode = code.substring(0, trimStart);
 
-            const base64Code = "data:text/javascript;base64," + btoa(trimmedCode);
-            const css = (await import(base64Code)).default;
-
-            if (!css) {
-                return ""; // Empty CSS file
+                    const base64Code = "data:text/javascript;base64," + btoa(trimmedCode);
+                    css = (await import(base64Code)).default;
+                } catch (e) {
+                    console.log("Failed to load CSS as a module. Returns as pure code. Use `importFromModule: false`");
+                    css = code;
+                }
+            } else {
+                css = code;
             }
 
             const indexOfSourceMap = css.indexOf("/*# sourceMappingURL");
@@ -165,12 +179,14 @@ function extractCssPlugin({callback, overwriteBundle}) {
     }
 
     return {
-        name: "css-extract",
+        name: "css-bundle-plugin",
         transform(code, id) {
             const isCss = [".css", ".sass", ".scss", ".less", ".stylus"].some(ext => id.endsWith(ext));
             if (isCss) {
                 entries.push({code, id});
-                return "";
+                if (removeCode) {
+                    return {code: "", map: {mappings: ""}};
+                }
             }
         },
         async generateBundle(opts, bundles, isWrite) {

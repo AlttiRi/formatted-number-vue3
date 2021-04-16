@@ -2,6 +2,7 @@
 
 repo_name="formatted-number-vue3";
 owner_name="AlttiRi";
+index_html="index.html";
 
 # Config ("true" to enable)
 install="false"
@@ -55,7 +56,7 @@ fi
 cd ..
 
 cp -r ./dist/ $folder_name/ && 
-cp index.html $folder_name/index.html && 
+cp $index_html $folder_name/index.html && 
 cd $folder_name/
 
 ls -l

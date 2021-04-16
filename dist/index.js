@@ -271,6 +271,36 @@
     ]))
   });
 
+  function styleInject(css, ref) {
+    if ( ref === void 0 ) ref = {};
+    var insertAt = ref.insertAt;
+
+    if (!css || typeof document === 'undefined') { return; }
+
+    var head = document.head || document.getElementsByTagName('head')[0];
+    var style = document.createElement('style');
+    style.type = 'text/css';
+
+    if (insertAt === 'top') {
+      if (head.firstChild) {
+        head.insertBefore(style, head.firstChild);
+      } else {
+        head.appendChild(style);
+      }
+    } else {
+      head.appendChild(style);
+    }
+
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }
+  }
+
+  var css_248z = ".main[data-v-f889b9d8] {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  height: 100%;\n}\n.main[data-v-f889b9d8]  .formatted-number {\n  font-size: 8vw;\n  color: cornflowerblue;\n  text-shadow: 0 0 2vw #08080840;\n}\n.main[data-v-f889b9d8]  .formatted-number .trio .padded {\n  letter-spacing: 1.6vw;\n}\n@media all and (min-width: 1500px) {\n.main[data-v-f889b9d8]  .formatted-number {\n    font-size: 120px;\n    text-shadow: 0 0 30px #08080840;\n}\n.main[data-v-f889b9d8]  .formatted-number .trio .padded {\n    letter-spacing: 24px;\n}\n}";
+  styleInject(css_248z);
+
   script.render = render;
   script.__scopeId = "data-v-f889b9d8";
   script.__file = "components/Main.vue";

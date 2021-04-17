@@ -139,7 +139,7 @@ function sourceMapsPathChangerPlugin(pathsMapping = []) {
  */
 function cssBundlePlugin({callback, overwriteBundle, importFromModule, removeCode} = {}) {
     const btoa = str => Buffer.from(str, "binary").toString("base64");
-//const atob = b64 => Buffer.from(b64, "base64").toString("binary");
+  //const atob = b64 => Buffer.from(b64, "base64").toString("binary");
 
     const entries = [];
     async function resultCssBundle() {
@@ -171,9 +171,10 @@ function cssBundlePlugin({callback, overwriteBundle, importFromModule, removeCod
             const indexOfSourceMap = css.indexOf("/*# sourceMappingURL");
             const to = indexOfSourceMap === -1 ? css.length : indexOfSourceMap;
             const from = css.charAt(0) === "\n" ? 1 : 0;
-            const result = "/* " + filename + " */\n" + css.substring(from, to);
-
-            results.push(result);
+            if (css.trim()) {
+                const result = "/* " + filename + " */\n" + css.substring(from, to);
+                results.push(result);
+            }
         }
         return results.join("\n");
     }

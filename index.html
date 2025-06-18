@@ -38,7 +38,7 @@
     const _min = min !== null ? min : !_dev;
 
     Promise.resolve()
-        // To debug Vue.js set `process.env.NODE_ENV` to `dev` (in build.js) if you does not load it from CDN.
+        // To debug Vue.js set `process.env.NODE_ENV` to `dev` (in build.js) if you do not load it from CDN.
      // .then(_ => appendScript(`https://cdn.jsdelivr.net/npm/vue/dist/vue.runtime${_dev ? "" : ".min"}.js`))              // Vue 2
      // .then(_ => appendScript(`https://cdn.jsdelivr.net/npm/vue@next/dist/vue.runtime.global${_dev ? "" : ".prod"}.js`)) // Vue 3 (dead links)       
         .then(_ => appendScript(`https://alttiri.github.io/3rd-party-libs/vue-3.2.6/vue.runtime.global${_dev ? "" : ".prod"}.js`)) // Vue 3

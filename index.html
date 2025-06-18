@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Formatted Number – Demo</title>
+    <meta name="description"
+          content="Vue based demo site. It just shows formatted MAX_SAFE_INTEGER value. Click on the number and it will change the color.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            min-height: 100vh;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+    <link rel="stylesheet" href="./dist/style.css">
+</head>
+<body>
+
+<div id="app"></div>
+
+<script type="module">
+    // Add search param `dev=true` for developer Vue version. (You can use the Vue.js extension)
+    // Add search param `min=true` for minified version of the app script.
+    // For example, `dev=true&min=true`
+
+    const url = new URL(location.href);
+    const dev = JSON.parse(url.searchParams.get("dev"));
+    const min = JSON.parse(url.searchParams.get("min"));
+    const isLocalHost = ["localhost", "127.0.0.1"].includes(url.hostname);
+
+    const _dev = dev !== null ? dev : isLocalHost;
+    const _min = min !== null ? min : !_dev;
+
+    Promise.resolve()
+        // To debug Vue.js set `process.env.NODE_ENV` to `dev` (in build.js) if you do not load it from CDN.
+     // .then(_ => appendScript(`https://cdn.jsdelivr.net/npm/vue/dist/vue.runtime${_dev ? "" : ".min"}.js`))              // Vue 2
+     // .then(_ => appendScript(`https://cdn.jsdelivr.net/npm/vue@next/dist/vue.runtime.global${_dev ? "" : ".prod"}.js`)) // Vue 3 (dead links)       
+        .then(_ => appendScript(`https://alttiri.github.io/3rd-party-libs/vue-3.2.6/vue.runtime.global${_dev ? "" : ".prod"}.js`)) // Vue 3
+        .then(_ => appendScript(`./dist/index${_min ? ".min" : ""}.js`));
+
+    function appendScript(src) {
+        return new Promise(resolve => {
+            const script = document.createElement("script");
+            script.onload = resolve;
+            script.src = src;
+            document.querySelector("body").append(script);
+        });
+    }
+</script>
+
+</body>
+</html>
